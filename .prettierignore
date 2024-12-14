@@ -1,0 +1,9 @@
+**/*.css
+**/*.html
+dist
+build
+
+schema.graphql
+./keystone
+
+package-lock.json
