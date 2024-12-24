@@ -10,6 +10,7 @@ import { getUrlType } from '../Util/URL.js';
 export type UIAppOptions = {
   // The URL of the dev server or the file system path to the UI.
   url: string;
+  index?: string;
 };
 
 export async function makeUIApp(options: UIAppOptions): Promise<Hono> {
@@ -43,14 +44,15 @@ async function makeProxyApp(options: UIAppOptions) {
 async function makeFSApp(options: UIAppOptions) {
   const app = new Hono();
   const uiDir = options.url;
+  const index = options.index ?? 'index.html';
 
-  const mainHtml = await fs.readFile(path.join(uiDir, 'index.html'), 'utf-8');
+  const htmlFile = await fs.readFile(path.join(uiDir, index), 'utf-8');
 
   // Serve static files from the UI directory without authentication.
   app.get('/:filename{(.+\\..+$)|^@.+}', serveStatic({ root: uiDir }));
 
   app.get('*', async (c) => {
-    return serveMain(c, mainHtml);
+    return serveMain(c, htmlFile);
   });
 
   return app;
